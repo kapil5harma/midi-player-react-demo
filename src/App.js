@@ -26,16 +26,15 @@ var stop = function() {
 
 class App extends Component {
   state = {
-    isPlaying: false
+    isPlaying: false,
+    tempo: 120
   };
 
   clickHandler = () => {
-    const { isPlaying } = this.state;
-    console.log('isPlaying: ', isPlaying);
+    const { isPlaying, tempo } = this.state;
     if (isPlaying) {
       this.setState(
         currentState => {
-          console.log('currentState: ', currentState);
           return { isPlaying: !currentState.isPlaying };
         },
         () => {
@@ -61,17 +60,14 @@ class App extends Component {
                 if (event.name == 'Note on') {
                   instrument.play(event.noteName, ac.currentTime, { gain: event.velocity / 100 });
                 }
-
-                document.getElementById('tempo-display').innerHTML = Player.tempo;
-                document.getElementById('file-format-display').innerHTML = Player.format;
-                document.getElementById('play-bar').style.width = 100 - Player.getSongPercentRemaining() + '%';
+                // document.getElementById('file-format-display').innerHTML = Player.format;
+                // document.getElementById('play-bar').style.width = 100 - Player.getSongPercentRemaining() + '%';
               });
 
               Player.loadArrayBuffer(reader.result);
-              console.log('this: ', this);
+
               this.setState(
                 currentState => {
-                  console.log('currentState: ', currentState);
                   return { isPlaying: !currentState.isPlaying };
                 },
                 () => {
@@ -87,6 +83,11 @@ class App extends Component {
     }
   };
 
+  tempoChangeHandler = e => {
+    const tempo = e.currentTarget.value;
+    this.setState({ tempo }, () => changeTempo(tempo));
+  };
+
   render() {
     const { isPlaying } = this.state;
     return (
@@ -100,11 +101,17 @@ class App extends Component {
           <div className='bar'>
             <span id='play-bar' />
           </div>
+          <input
+            type='range'
+            name='range'
+            value={this.state.tempo}
+            id='range'
+            min='50'
+            max='200'
+            onChange={e => this.tempoChangeHandler(e)}
+          />
           <div>
-            Tempo: <span id='tempo-display'>0</span>
-          </div>
-          <div>
-            File Format: <span id='file-format-display'>NA</span>
+            Tempo: <span id='tempo-display'>{this.state.tempo}</span>
           </div>
         </main>
       </div>
